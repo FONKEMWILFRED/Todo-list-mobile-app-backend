@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const User = required("../models/User");
+const User = require("../models/User");
 const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
 
 router.post("/auth/signup", async (requestAnimationFrame, res) => {  // call back fxn
 
@@ -27,5 +28,40 @@ router.post("/auth/signup", async (requestAnimationFrame, res) => {  // call bac
 
     }
 });
+
+
+router.post("/login", async (req, res) => {
+
+    try {
+        const formData = req.body;
+        const existingUser = await User.findOne({email: formData.email });
+        if(!existingUser) {
+        return res.status(400).json({message:" User not found"});
+    
+}
+
+ const comparePasswords = await bcrypt.compare(
+
+    formData.password,
+    existingUser.password
+ );
+
+ if (!comparePasswords){
+
+    return res.status(405).json({message: "Incorrect password " });
+ }
+ const token = jwt.sign({userid: existingUser.id}, process.env.JWT_SECRET, {
+    expiresIn : "1d",
+ });
+ return res.status(201).json({message: "Login successful" , token : token });
+}
+catch(err) {
+    console.log("Error signin: ", err);
+    return res.status(501).json({message: " Internal server error"});
+
+}
+
+});
+
 
 module.exports = router;

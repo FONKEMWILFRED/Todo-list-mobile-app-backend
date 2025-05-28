@@ -10,5 +10,5 @@ const userSchema = new mongoose.Schema({
 
 });
 
-const User = mangoose.Model("User",userSchema);
+const User = mangoose.model("User",userSchema);
 module.exports=User;
